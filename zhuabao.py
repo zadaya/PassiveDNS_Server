@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from scapy.layers.inet import *
-from scapy.sendrecv import sniff
+from scapy.all import sniff
 
 def pack_callback(packet):
     print(packet.show())
