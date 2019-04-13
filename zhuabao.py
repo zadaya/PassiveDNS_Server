@@ -7,7 +7,12 @@ def pack_callback(packet):
     # print(packet.show())
     if packet[UDP].payload:
         if (packet.sprintf("%DNS.qr%") == "1"):
-            print(packet.show())
+            print(packet[DNS].show())
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            domain_str = packet.sprintf("%DNSQR.qname%")
+            ipaddr_str = packet.sprintf("%DNSRR.rdata%")
+            print(domain_str+":"+ipaddr_str)
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         # if (packet.sprintf("%DNS.qr%") == "0"):
         #     print("\n\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n")
 
