@@ -1,5 +1,3 @@
-# coding:utf-8
-
 from scapy.layers.inet import *
 from scapy.all import sniff
 
@@ -7,7 +5,7 @@ def pack_callback(packet):
     # print(packet.show())
     if packet[UDP].payload:
         if (packet.sprintf("%DNS.qr%") == "1"):
-            print(packet[DNS].show())
+            print(packet[UDP].show())
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             domain_str = packet.sprintf("%DNSQR.qname%")
             ipaddr_str = packet.sprintf("%DNSRR.rdata%")
