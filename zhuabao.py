@@ -1,13 +1,15 @@
 from scapy.layers.inet import *
 from scapy.all import sniff
+from scapy.all import *
 
 def pack_callback(packet):
     # print(packet.show())
     if packet[UDP].payload:
         if (packet.sprintf("%DNS.qr%") == "1"):
-            print(packet[UDP].show())
+            # print(packet[UDP].show())
+            packet[UDP][DNS][DNSRR].display()
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            domain_str = packet.sprintf("%DNSQR.qname%")
+            domain_str = packet[UDP][DNS][DNSRR].sprintf("%.qname%")
             ipaddr_str = packet.sprintf("%DNSRR.rdata%")
             print(domain_str+":"+ipaddr_str)
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
