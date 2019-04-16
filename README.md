@@ -89,7 +89,3 @@ conn = mysql.connect(user='root', passwd='yourpassword', host='127.0.0.1', db='d
 
 ### pdns_sniff的相关代码
 [pdns_sniff代码](https://github.com/coffeehb/tools/pdns_sniff)
-
-### 欢迎交流
-
-QQ: 759601966
