@@ -1,6 +1,7 @@
 from scapy.layers.inet import *
 from scapy.all import sniff
-from scapy.all import *
+import os
+
 
 def pack_callback(packet):
     # print(packet.show())
@@ -11,19 +12,23 @@ def pack_callback(packet):
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             domain_str = packet[UDP][DNS][DNSRR].sprintf("%.qname%")
             ipaddr_str = packet.sprintf("%DNSRR.rdata%")
-            print(domain_str+":"+ipaddr_str)
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print(domain_str + ":" + ipaddr_str)
+            print(
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            )
         # if (packet.sprintf("%DNS.qr%") == "0"):
         #     print("\n\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n")
 
         # aaaa=packet.sprintf("Etherent source: %Ether.src%    IP src: %IP.src%    DNS src: %DNS.id%")
         # print(aaaa)
         # print("###################################################################")
-    
+
         # DNS_packet = str(packet[UDP].payload)
         # if "user" in DNS_packet.lower() or "pass" in DNS_packet.lower():
         #     print("Server:%s" % packet[IP].dst)
         #     print("%s" % packet[UDP].payload)
 
-#sniff()第一个参数可以筛选协议类型及端口号，第二个参数设置监听的网卡名
-dnsSniffPacket = sniff(filter="udp port 53", iface='Realtek PCIe GbE Family Controller', prn=pack_callback, count=100)
+
+# sniff()第一个参数可以筛选协议类型及端口号，第二个参数设置监听的网卡名
+iface = os.getenv("IFACE", "Realtek PCIe GbE Family Controller")
+dnsSniffPacket = sniff(filter="udp port 53", iface=iface, prn=pack_callback, count=100)
