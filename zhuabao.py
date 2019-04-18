@@ -1,15 +1,34 @@
-# coding:utf-8
-
 from scapy.layers.inet import *
 from scapy.all import sniff
+import os
+
 
 def pack_callback(packet):
-    print(packet.show())
+    # print(packet.show())
     if packet[UDP].payload:
-        mail_packet = str(packet[UDP].payload)
-        if "user" in mail_packet.lower() or "pass" in mail_packet.lower():
-            print("Server:%s" % packet[IP].dst)
-            print("%s" % packet[UDP].payload)
+        if (packet.sprintf("%DNS.qr%") == "1"):
+            # print(packet[UDP].show())
+            packet[UDP][DNS][DNSRR].display()
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            domain_str = packet[UDP][DNS][DNSRR].sprintf("%.qname%")
+            ipaddr_str = packet.sprintf("%DNSRR.rdata%")
+            print(domain_str + ":" + ipaddr_str)
+            print(
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            )
+        # if (packet.sprintf("%DNS.qr%") == "0"):
+        #     print("\n\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n")
 
-#sniff()第一个参数可以筛选协议类型及端口号，第二个参数设置监听的网卡名
-sniff(filter="udp port 53", iface='Realtek PCIe GbE Family Controller', prn=pack_callback, count=100)
+        # aaaa=packet.sprintf("Etherent source: %Ether.src%    IP src: %IP.src%    DNS src: %DNS.id%")
+        # print(aaaa)
+        # print("###################################################################")
+
+        # DNS_packet = str(packet[UDP].payload)
+        # if "user" in DNS_packet.lower() or "pass" in DNS_packet.lower():
+        #     print("Server:%s" % packet[IP].dst)
+        #     print("%s" % packet[UDP].payload)
+
+
+# sniff()第一个参数可以筛选协议类型及端口号，第二个参数设置监听的网卡名
+iface = os.getenv("IFACE", "Realtek PCIe GbE Family Controller")
+dnsSniffPacket = sniff(filter="udp port 53", iface=iface, prn=pack_callback, count=100)
