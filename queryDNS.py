@@ -1,5 +1,7 @@
 
 from scapy.all import *
+#导入socket的包
+from socket import *
 
 def dns_query(dns_name):
 	dns_result = sr1(IP(dst="114.114.114.114")/UDP()/DNS(id=168,qr=0,opcode=0,rd=1,qd=DNSQR(qname=dns_name)),verbose=False)
@@ -28,3 +30,18 @@ while True:
 #         print("循环结束！")
 #         break
 #     print("您输入的是：" + str)
+
+
+# 创建 socket 对象
+udpSocket = socket(AF_INET, SOCK_DGRAM)
+# 本地主机绑定端口
+udpSocket.bind(("",8080))
+# 主函数
+def main():
+    while True:
+        # 接收信息
+        msg,addrInfo = udpSocket.recvfrom(1024)
+        # 收到信息后使用 utf-8 解码
+        #print("收到来自 %s 的信息：%s"%(addrInfo[0],msg.decode("utf-8")))
+if __name__ == '__main__':
+    main()
