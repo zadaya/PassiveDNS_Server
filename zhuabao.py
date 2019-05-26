@@ -8,27 +8,14 @@ def pack_callback(packet):
     if packet[UDP].payload:
         if (packet.sprintf("%DNS.qr%") == "1"):
             # print(packet[UDP].show())
-            packet[UDP][DNS][DNSRR].display()
+            # packet['DNSRR'].show()
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            domain_str = packet[UDP][DNS][DNSRR].sprintf("%.qname%")
-            ipaddr_str = packet.sprintf("%DNSRR.rdata%")
-            print(domain_str + ":" + ipaddr_str)
-            print(
-                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            )
-        # if (packet.sprintf("%DNS.qr%") == "0"):
-        #     print("\n\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n")
-
-        # aaaa=packet.sprintf("Etherent source: %Ether.src%    IP src: %IP.src%    DNS src: %DNS.id%")
-        # print(aaaa)
-        # print("###################################################################")
-
-        # DNS_packet = str(packet[UDP].payload)
-        # if "user" in DNS_packet.lower() or "pass" in DNS_packet.lower():
-        #     print("Server:%s" % packet[IP].dst)
-        #     print("%s" % packet[UDP].payload)
-
+            for i in range(1,packet['DNS'].ancount+1):
+                domain_str = packet['DNSRR'][i-1].rrname
+                ipaddr_str = packet['DNSRR'][i-1].rdata
+                print("[No.%d] response: Qname: %s    Rdata: %s" % (i, domain_str, ipaddr_str))
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 # sniff()第一个参数可以筛选协议类型及端口号，第二个参数设置监听的网卡名
 iface = os.getenv("IFACE", "Realtek PCIe GbE Family Controller")
-dnsSniffPacket = sniff(filter="udp port 53", iface=iface, prn=pack_callback, count=100)
+dnsSniffPacket = sniff(filter="udp port 53", iface=iface, prn=pack_callback, count=0)

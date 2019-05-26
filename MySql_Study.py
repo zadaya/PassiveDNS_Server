@@ -15,18 +15,19 @@ def connectDB():
 # 创建表
 def createTable():
     # 创建一个表
-    sqll = 'CREATE TABLE aaa(title varchar(40),amount int,month int,interest float)'
-    sqll = 'CREATE TABLE testTable(title varchar(40),amount int,month int,interest float)'
+    # sqlStr = 'CREATE TABLE aaa(title varchar(40),amount int,month int,interest float)'
+    sqlStr = 'CREATE TABLE dnslogs(id int primary key not null auto_increment , domain varchar(255), domain_ip varchar(40), dns_client_ip varchar(40), dns_server_ip varchar(40), record_time varchar(255))'
     # 使用cursor()方法执行sql语句
-    cursor.execute(sqll)
+    cursor.execute(sqlStr)
 
 
 sql = "INSERT INTO dnslogs (domain, domain_ip, dns_client_ip, dns_server_ip, record_time) VALUES ('%s','%s','%s','%s','%s')"
-data = ('www.zadaya.com', '10.250.17.23', '121.250.17.113', '121.250.17.23', '1.223')
+data = ('www.zzzzzzaaaaa.com', '10.250.17.23', '121.250.17.113', '121.250.17.23', '1.223')
 
 db = connectDB()
 # 使用cursor()方法创建一个游标对象
 cursor = db.cursor()
+#createTable()
 cursor.execute(sql % data)
 db.commit()
 print('成功插入', cursor.rowcount, '条数据')
