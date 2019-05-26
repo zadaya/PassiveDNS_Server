@@ -1,18 +1,24 @@
-from scapy.layers.inet import *
-from scapy.all import sniff
 import os
+
+from scapy.all import sniff
+from scapy.layers.inet import *
+
+from PassiveDNS_Server.dnslogsDao import Mysql_Study
 
 
 def pack_callback(packet):
-    # print(packet.show())
+    print(packet.show())
     if packet[UDP].payload:
         if (packet.sprintf("%DNS.qr%") == "1"):
             # print(packet[UDP].show())
             # packet['DNSRR'].show()
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             for i in range(1,packet['DNS'].ancount+1):
-                domain_str = packet['DNSRR'][i-1].rrname
+                domain_str = packet['DNSRR'][0].rrname
                 ipaddr_str = packet['DNSRR'][i-1].rdata
+                # if packet['DNSRR'][i-1].type=='A':
+                #     DBTest = Mysql_Study()
+                #     Mysql_Study.insertData()
                 print("[No.%d] response: Qname: %s    Rdata: %s" % (i, domain_str, ipaddr_str))
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
