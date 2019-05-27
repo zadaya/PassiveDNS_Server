@@ -14,7 +14,7 @@ class Mysql_Study():
 
     # 创建表
     def createTable(self):
-        db = connectDB()
+        db = self.connectDB()
         # 使用cursor()方法创建一个游标对象
         cursor = db.cursor()
         # 创建一个表
@@ -25,7 +25,7 @@ class Mysql_Study():
 
     # 插入数据
     def insertData(self):
-        db = connectDB()
+        db = self.connectDB()
         # 使用cursor()方法创建一个游标对象
         cursor = db.cursor()
         sql = "INSERT INTO dnslogs (domain, domain_ip, dns_client_ip, dns_server_ip, record_time) VALUES ('%s','%s','%s','%s','%s')"
@@ -33,6 +33,9 @@ class Mysql_Study():
         cursor.execute(sql % data)
         db.commit()
         print('成功插入', cursor.rowcount, '条数据')
+    
+    def sayHello(self):
+        print("######################hello zadaya~!##########################")
 
 # SqlTest = Mysql_Study()
 # sql = "INSERT INTO dnslogs (domain, domain_ip, dns_client_ip, dns_server_ip, record_time) VALUES ('%s','%s','%s','%s','%s')"
