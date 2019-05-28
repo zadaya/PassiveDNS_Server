@@ -1,6 +1,6 @@
 # 导入pymysql
 import pymysql
-class Mysql_Study():
+class DnsLogsDao():
     # 连接MySQL数据库
     def connectDB(self):
         # 输入数据库的IP地址，用户名，密码，端口
