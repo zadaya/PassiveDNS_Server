@@ -1,0 +1,4 @@
+*.html linguist-language=Python
+*.txt linguist-language=Python
+*.py linguist-language=Python
+*.toc linguist-language=Python
